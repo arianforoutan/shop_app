@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:loading_indicator/loading_indicator.dart';
 import 'package:shop_app/bloc/home/home_bloc.dart';
 import 'package:shop_app/bloc/home/home_event.dart';
 import 'package:shop_app/bloc/home/home_state.dart';
@@ -36,61 +37,77 @@ class _HomeScreenState extends State<HomeScreen> {
       backgroundColor: CustomColors.backgraoundscreencolor,
       body: SafeArea(
         child: BlocBuilder<HomeBloc, HomeState>(builder: (context, state) {
-          return CustomScrollView(
-            slivers: [
-              if (state is HomeLoadingState) ...{
-                SliverToBoxAdapter(
-                  child: Center(
-                    child: SizedBox(
-                      height: 24,
-                      width: 24,
-                      child: CircularProgressIndicator(),
-                    ),
-                  ),
-                )
-              } else ...{
-                _getSearchbox(),
-                if (state is HomeRequestSuccessState) ...[
-                  state.bannerList.fold((exeptionMessage) {
-                    return SliverToBoxAdapter(
-                      child: Text(exeptionMessage),
-                    );
-                  }, (listBanners) {
-                    return _getbanners(listBanners);
-                  })
-                ],
-                _getCategoryListTitle(),
-                if (state is HomeRequestSuccessState) ...[
-                  state.categoryList.fold((exeptionMessage) {
-                    return SliverToBoxAdapter(
-                      child: Text(exeptionMessage),
-                    );
-                  }, (categorylist) {
-                    return _getCategoryList(categorylist);
-                  })
-                ],
-                const _getBestSellerTitle(),
-                if (state is HomeRequestSuccessState) ...[
-                  state.bestsellerProductlist.fold((exeptionMessage) {
-                    return SliverToBoxAdapter(
-                      child: Text(exeptionMessage),
-                    );
-                  }, (productList) {
-                    return _getBestSellerProduct(productList);
-                  })
-                ],
-                const _getMostViewedTitle(),
-                if (state is HomeRequestSuccessState) ...[
-                  state.hotestProductlist.fold((exeptionMessage) {
-                    return SliverToBoxAdapter(child: Text(exeptionMessage));
-                  }, (productList) {
-                    return _getMostViewedProducts(productList);
-                  })
-                ]
-              },
-            ],
-          );
+          return _getHomeScreenContent(state);
         }),
+      ),
+    );
+  }
+}
+
+Widget _getHomeScreenContent(HomeState state) {
+  if (state is HomeLoadingState) {
+    return const Center(
+      child: LoadingAnimation(),
+    );
+  } else if (state is HomeRequestSuccessState) {
+    return CustomScrollView(
+      slivers: [
+        _getSearchbox(),
+        state.bannerList.fold((exeptionMessage) {
+          return SliverToBoxAdapter(
+            child: Text(exeptionMessage),
+          );
+        }, (listBanners) {
+          return _getbanners(listBanners);
+        }),
+        _getCategoryListTitle(),
+        state.categoryList.fold((exeptionMessage) {
+          return SliverToBoxAdapter(
+            child: Text(exeptionMessage),
+          );
+        }, (categorylist) {
+          return _getCategoryList(categorylist);
+        }),
+        const _getBestSellerTitle(),
+        state.bestsellerProductlist.fold((exeptionMessage) {
+          return SliverToBoxAdapter(
+            child: Text(exeptionMessage),
+          );
+        }, (productList) {
+          return _getBestSellerProduct(productList);
+        }),
+        const _getMostViewedTitle(),
+        state.hotestProductlist.fold(
+          (exeptionMessage) {
+            return SliverToBoxAdapter(child: Text(exeptionMessage));
+          },
+          (productList) {
+            return _getMostViewedProducts(productList);
+          },
+        ),
+      ],
+    );
+  } else {
+    return const Center(
+      child: Text('error'),
+    );
+  }
+}
+
+class LoadingAnimation extends StatelessWidget {
+  const LoadingAnimation({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 64,
+      width: 64,
+      child: LoadingIndicator(
+        indicatorType: Indicator.orbit,
+        colors: [CustomColors.blueIndicator],
+        strokeWidth: 5,
       ),
     );
   }
