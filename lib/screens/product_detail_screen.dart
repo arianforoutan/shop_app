@@ -14,6 +14,7 @@ import 'package:shop_app/data/model/product.dart';
 import 'package:shop_app/data/model/product_image.dart';
 import 'package:shop_app/data/model/product_variant.dart';
 import 'package:shop_app/data/model/variant_type.dart';
+import 'package:shop_app/util/extentions/double_extention.dart';
 
 import 'package:shop_app/widgets/cached_image.dart';
 
@@ -289,7 +290,7 @@ class DetailContentWidget extends StatelessWidget {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          PriceTagButton(),
+                          PriceTagButton(parentWidget.product),
                           AddToBasketButton(parentWidget.product),
                         ],
                       ),
@@ -354,7 +355,8 @@ class AddToBasketButton extends StatelessWidget {
 }
 
 class PriceTagButton extends StatelessWidget {
-  const PriceTagButton({super.key});
+  Product product;
+  PriceTagButton(this.product, {super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -381,6 +383,7 @@ class PriceTagButton extends StatelessWidget {
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 10),
                   child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     mainAxisSize: MainAxisSize.max,
                     children: [
                       const Text(
@@ -393,23 +396,23 @@ class PriceTagButton extends StatelessWidget {
                       const SizedBox(
                         width: 5,
                       ),
-                      const Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            '۴۹،۸۰۰،۰۰۰',
-                            style: TextStyle(
+                            product.price.FormatPrice(),
+                            style: const TextStyle(
                                 fontFamily: 'sm',
-                                fontSize: 12,
+                                fontSize: 11,
                                 color: Colors.white,
                                 decoration: TextDecoration.lineThrough),
                           ),
                           Text(
-                            '۴۸،۸۰۰،۰۰۰',
-                            style: TextStyle(
+                            product.realprice.FormatPrice(),
+                            style: const TextStyle(
                               fontFamily: 'sm',
-                              fontSize: 16,
+                              fontSize: 15,
                               color: Colors.white,
                             ),
                           ),
@@ -423,15 +426,27 @@ class PriceTagButton extends StatelessWidget {
                             Radius.circular(15),
                           ),
                         ),
-                        child: const Padding(
+                        child: Padding(
                           padding:
                               EdgeInsets.symmetric(vertical: 2, horizontal: 6),
-                          child: Text(
-                            '٪۳',
-                            style: TextStyle(
-                                fontFamily: 'sb',
-                                fontSize: 12,
-                                color: Colors.white),
+                          child: Row(
+                            children: [
+                              Text(
+                                '%',
+                                style: TextStyle(
+                                    fontFamily: 'SB',
+                                    fontSize: 8,
+                                    color: Colors.white),
+                              ),
+                              Text(
+                                product.persent!.roundToDouble().toString(),
+                                textAlign: TextAlign.center,
+                                style: const TextStyle(
+                                    fontFamily: 'SM',
+                                    fontSize: 8,
+                                    color: Colors.white),
+                              ),
+                            ],
                           ),
                         ),
                       )
