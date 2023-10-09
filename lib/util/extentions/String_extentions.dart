@@ -1,5 +1,7 @@
 import 'dart:ui';
 
+import 'package:intl/intl.dart';
+
 extension ColorParsing on String? {
   Color parstoColor() {
     String colortext = 'ff${this}';

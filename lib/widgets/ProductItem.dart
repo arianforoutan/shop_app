@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:intl/intl.dart';
 import 'package:shop_app/bloc/product/product_bloc.dart';
 import 'package:shop_app/data/model/product.dart';
 import 'package:shop_app/di/di.dart';
+import 'package:shop_app/util/extentions/double_extention.dart';
 import 'package:shop_app/widgets/cached_image.dart';
 
 import '../bloc/basketitem/basket_bloc.dart';
@@ -105,14 +107,11 @@ class ProductItem extends StatelessWidget {
               color: Colors.white,
               child: Padding(
                 padding: const EdgeInsets.only(top: 20, bottom: 10, right: 10),
-                child: Directionality(
-                  textDirection: TextDirection.ltr,
-                  child: Text(
-                    product.name,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(fontFamily: 'SM', fontSize: 14),
-                    textAlign: TextAlign.end,
-                  ),
+                child: Text(
+                  product.name,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(fontFamily: 'SM', fontSize: 14),
+                  textAlign: TextAlign.end,
                 ),
               ),
             ),
@@ -145,7 +144,7 @@ class ProductItem extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
                       Text(
-                        product.price.toString(),
+                        product.price.FormatPrice(),
                         style: const TextStyle(
                             decoration: TextDecoration.lineThrough,
                             fontFamily: 'SM',
@@ -153,8 +152,8 @@ class ProductItem extends StatelessWidget {
                             color: Colors.white),
                       ),
                       Text(
-                        product.realprice.toString(),
-                        style: TextStyle(
+                        product.realprice.FormatPrice(),
+                        style: const TextStyle(
                             fontFamily: 'SM',
                             fontSize: 15,
                             color: Colors.white),
