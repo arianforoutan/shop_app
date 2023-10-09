@@ -8,6 +8,7 @@ import 'package:shop_app/bloc/basketitem/basket_event.dart';
 
 import 'package:shop_app/bloc/category/category_bloc.dart';
 import 'package:shop_app/bloc/home/home_bloc.dart';
+import 'package:shop_app/bloc/home/home_event.dart';
 import 'package:shop_app/constants/colors.dart';
 
 import 'package:shop_app/di/di.dart';
@@ -144,7 +145,11 @@ class _MyAppState extends State<MyApp> {
       Directionality(
         textDirection: TextDirection.rtl,
         child: BlocProvider(
-          create: (context) => HomeBloc(),
+          create: (context) {
+            var bloc = HomeBloc();
+            bloc.add(HomeGetInitilzeData());
+            return bloc;
+          },
           child: HomeScreen(),
         ),
       )

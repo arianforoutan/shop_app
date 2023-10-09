@@ -1,5 +1,3 @@
-// ignore_for_file: must_be_immutable
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:loading_indicator/loading_indicator.dart';
@@ -16,20 +14,8 @@ import '../widgets/ProductItem.dart';
 import '../widgets/banner_slider.dart';
 import '../widgets/category_icon_item_list.dart';
 
-class HomeScreen extends StatefulWidget {
+class HomeScreen extends StatelessWidget {
   const HomeScreen({Key? key}) : super(key: key);
-
-  @override
-  State<HomeScreen> createState() => _HomeScreenState();
-}
-
-class _HomeScreenState extends State<HomeScreen> {
-  @override
-  void initState() {
-    BlocProvider.of<HomeBloc>(context).add(HomeGetInitilzeData());
-    // TODO: implement initState
-    super.initState();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -37,55 +23,60 @@ class _HomeScreenState extends State<HomeScreen> {
       backgroundColor: CustomColors.backgraoundscreencolor,
       body: SafeArea(
         child: BlocBuilder<HomeBloc, HomeState>(builder: (context, state) {
-          return _getHomeScreenContent(state);
+          return _getHomeScreenContent(state, context);
         }),
       ),
     );
   }
 }
 
-Widget _getHomeScreenContent(HomeState state) {
+Widget _getHomeScreenContent(HomeState state, BuildContext context) {
   if (state is HomeLoadingState) {
     return const Center(
       child: LoadingAnimation(),
     );
   } else if (state is HomeRequestSuccessState) {
-    return CustomScrollView(
-      slivers: [
-        _getSearchbox(),
-        state.bannerList.fold((exeptionMessage) {
-          return SliverToBoxAdapter(
-            child: Text(exeptionMessage),
-          );
-        }, (listBanners) {
-          return _getbanners(listBanners);
-        }),
-        _getCategoryListTitle(),
-        state.categoryList.fold((exeptionMessage) {
-          return SliverToBoxAdapter(
-            child: Text(exeptionMessage),
-          );
-        }, (categorylist) {
-          return _getCategoryList(categorylist);
-        }),
-        const _getBestSellerTitle(),
-        state.bestsellerProductlist.fold((exeptionMessage) {
-          return SliverToBoxAdapter(
-            child: Text(exeptionMessage),
-          );
-        }, (productList) {
-          return _getBestSellerProduct(productList);
-        }),
-        const _getMostViewedTitle(),
-        state.hotestProductlist.fold(
-          (exeptionMessage) {
-            return SliverToBoxAdapter(child: Text(exeptionMessage));
-          },
-          (productList) {
-            return _getMostViewedProducts(productList);
-          },
-        ),
-      ],
+    return RefreshIndicator(
+      onRefresh: () async {
+        context.read<HomeBloc>().add(HomeGetInitilzeData());
+      },
+      child: CustomScrollView(
+        slivers: [
+          _getSearchbox(),
+          state.bannerList.fold((exeptionMessage) {
+            return SliverToBoxAdapter(
+              child: Text(exeptionMessage),
+            );
+          }, (listBanners) {
+            return _getbanners(listBanners);
+          }),
+          _getCategoryListTitle(),
+          state.categoryList.fold((exeptionMessage) {
+            return SliverToBoxAdapter(
+              child: Text(exeptionMessage),
+            );
+          }, (categorylist) {
+            return _getCategoryList(categorylist);
+          }),
+          const _getBestSellerTitle(),
+          state.bestsellerProductlist.fold((exeptionMessage) {
+            return SliverToBoxAdapter(
+              child: Text(exeptionMessage),
+            );
+          }, (productList) {
+            return _getBestSellerProduct(productList);
+          }),
+          const _getMostViewedTitle(),
+          state.hotestProductlist.fold(
+            (exeptionMessage) {
+              return SliverToBoxAdapter(child: Text(exeptionMessage));
+            },
+            (productList) {
+              return _getMostViewedProducts(productList);
+            },
+          ),
+        ],
+      ),
     );
   } else {
     return const Center(
@@ -101,7 +92,7 @@ class LoadingAnimation extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
+    return const SizedBox(
       height: 64,
       width: 64,
       child: LoadingIndicator(
@@ -124,7 +115,7 @@ class _getMostViewedProducts extends StatelessWidget {
   Widget build(BuildContext context) {
     return SliverToBoxAdapter(
       child: Padding(
-        padding: EdgeInsets.only(right: 0),
+        padding: const EdgeInsets.only(right: 0),
         child: SizedBox(
           height: 248,
           child: ListView.builder(
@@ -133,12 +124,12 @@ class _getMostViewedProducts extends StatelessWidget {
             itemBuilder: ((context, index) {
               if (index == 0) {
                 return Padding(
-                  padding: EdgeInsets.only(right: 44, left: 10),
+                  padding: const EdgeInsets.only(right: 44, left: 10),
                   child: ProductItem(productList[index]),
                 );
               } else {
                 return Padding(
-                  padding: EdgeInsets.only(right: 10, left: 10),
+                  padding: const EdgeInsets.only(right: 10, left: 10),
                   child: ProductItem(productList[index]),
                 );
               }
