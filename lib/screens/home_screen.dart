@@ -7,6 +7,7 @@ import 'package:shop_app/bloc/home/home_state.dart';
 import 'package:shop_app/data/model/banner.dart';
 import 'package:shop_app/data/model/category.dart';
 import 'package:shop_app/data/model/product.dart';
+import 'package:shop_app/widgets/loadingAnimation.dart';
 
 import '../constants/colors.dart';
 
@@ -81,25 +82,6 @@ Widget _getHomeScreenContent(HomeState state, BuildContext context) {
   } else {
     return const Center(
       child: Text('error'),
-    );
-  }
-}
-
-class LoadingAnimation extends StatelessWidget {
-  const LoadingAnimation({
-    super.key,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return const SizedBox(
-      height: 64,
-      width: 64,
-      child: LoadingIndicator(
-        indicatorType: Indicator.orbit,
-        colors: [CustomColors.blueIndicator],
-        strokeWidth: 5,
-      ),
     );
   }
 }

@@ -17,6 +17,7 @@ import 'package:shop_app/data/model/variant_type.dart';
 import 'package:shop_app/util/extentions/double_extention.dart';
 
 import 'package:shop_app/widgets/cached_image.dart';
+import 'package:shop_app/widgets/loadingAnimation.dart';
 
 import '../data/model/product_peroperty.dart';
 import '../data/model/variant.dart';
@@ -41,15 +42,15 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
             widget.product.id, widget.product.categoryId));
         return bloc;
       }),
-      child: DetailContentWidget(
+      child: DetailScreenContent(
         parentWidget: widget,
       ),
     );
   }
 }
 
-class DetailContentWidget extends StatelessWidget {
-  const DetailContentWidget({
+class DetailScreenContent extends StatelessWidget {
+  const DetailScreenContent({
     Key? key,
     required this.parentWidget,
   }) : super(key: key);
@@ -62,6 +63,9 @@ class DetailContentWidget extends StatelessWidget {
       backgroundColor: CustomColors.backgraoundscreencolor,
       body: BlocBuilder<ProductBloc, ProductState>(
         builder: ((context, state) {
+          if (state is ProductDetailLoadingState) {
+            return Center(child: LoadingAnimation());
+          }
           return SafeArea(
             child: CustomScrollView(
               slivers: [
