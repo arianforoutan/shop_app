@@ -29,7 +29,7 @@ class CategoryProductRemoteDatasource extends ICategoryProductDatasoource {
       return response.data['items']
           .map<Product>((jsonObject) => Product.fromJson(jsonObject))
           .toList();
-    } on DioError catch (e) {
+    } on DioException catch (e) {
       print(e.response!.statusCode);
       throw ApiException(e.response?.statusCode, e.response?.data['message']);
     } catch (e) {
