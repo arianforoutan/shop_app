@@ -412,7 +412,7 @@ class PriceTagButton extends StatelessWidget {
                             product.realprice.FormatPrice(),
                             style: const TextStyle(
                               fontFamily: 'sm',
-                              fontSize: 15,
+                              fontSize: 16,
                               color: Colors.white,
                             ),
                           ),
@@ -435,15 +435,15 @@ class PriceTagButton extends StatelessWidget {
                                 '%',
                                 style: TextStyle(
                                     fontFamily: 'SB',
-                                    fontSize: 8,
+                                    fontSize: 10,
                                     color: Colors.white),
                               ),
                               Text(
-                                product.persent!.roundToDouble().toString(),
+                                product.persent!.round().toString(),
                                 textAlign: TextAlign.center,
                                 style: const TextStyle(
                                     fontFamily: 'SM',
-                                    fontSize: 8,
+                                    fontSize: 10,
                                     color: Colors.white),
                               ),
                             ],
