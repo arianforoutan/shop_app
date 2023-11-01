@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:shop_app/bloc/basketitem/basket_bloc.dart';
 import 'package:shop_app/bloc/basketitem/basket_event.dart';
+import 'package:shop_app/bloc/comment/bloc/comment_bloc.dart';
 import 'package:shop_app/bloc/product/produc_event.dart';
 import 'package:shop_app/bloc/product/product_bloc.dart';
 import 'package:shop_app/bloc/product/product_state.dart';
@@ -14,6 +15,7 @@ import 'package:shop_app/data/model/product.dart';
 import 'package:shop_app/data/model/product_image.dart';
 import 'package:shop_app/data/model/product_variant.dart';
 import 'package:shop_app/data/model/variant_type.dart';
+import 'package:shop_app/di/di.dart';
 import 'package:shop_app/util/extentions/double_extention.dart';
 
 import 'package:shop_app/widgets/cached_image.dart';
@@ -167,7 +169,28 @@ class DetailScreenContent extends StatelessWidget {
                 if (state is ProductDetailResponseState) ...{
                   SliverToBoxAdapter(
                     child: GestureDetector(
-                      onTap: () {},
+                      onTap: () {
+                        showModalBottomSheet(
+                            context: context,
+                            builder: ((context) {
+                              return BlocProvider(
+                                create: (context) {
+                                  final bloc = CommentBloc(locator.get());
+                                  bloc.add(CommentInitialzeEvent(
+                                      parentWidget.product.id));
+                                  return bloc;
+                                },
+                                child: DraggableScrollableSheet(
+                                  initialChildSize: 0.5,
+                                  maxChildSize: 0.8,
+                                  minChildSize: 0.3,
+                                  builder: (context, scrollController) {
+                                    return CommentBottomSheet(scrollController);
+                                  },
+                                ),
+                              );
+                            }));
+                      },
                       child: Container(
                         margin:
                             const EdgeInsets.only(top: 24, left: 44, right: 44),
@@ -306,6 +329,52 @@ class DetailScreenContent extends StatelessWidget {
           );
         }),
       ),
+    );
+  }
+}
+
+class CommentBottomSheet extends StatelessWidget {
+  CommentBottomSheet(
+    this.scrollController, {
+    super.key,
+  });
+  ScrollController scrollController;
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<CommentBloc, CommentState>(
+      builder: ((context, state) {
+        if (state is CommentLoading) {
+          return Center(
+            child: LoadingAnimation(),
+          );
+        }
+        return CustomScrollView(
+          controller: scrollController,
+          slivers: [
+            if (state is CommentResponse) ...{
+              state.response.fold(
+                (l) {
+                  return SliverToBoxAdapter(
+                    child: Text('loading'),
+                  );
+                },
+                (Commentlist) {
+                  if (Commentlist.isEmpty) {
+                    return SliverToBoxAdapter(
+                      child: Text('no comment'),
+                    );
+                  }
+                  return SliverList(
+                    delegate: SliverChildBuilderDelegate((context, index) {
+                      return Text(Commentlist[index].text);
+                    }, childCount: Commentlist.length),
+                  );
+                },
+              )
+            }
+          ],
+        );
+      }),
     );
   }
 }
