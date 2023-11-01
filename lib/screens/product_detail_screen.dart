@@ -181,9 +181,9 @@ class DetailScreenContent extends StatelessWidget {
                                   return bloc;
                                 },
                                 child: DraggableScrollableSheet(
-                                  initialChildSize: 0.5,
+                                  initialChildSize: 0.7,
                                   maxChildSize: 0.8,
-                                  minChildSize: 0.3,
+                                  minChildSize: 0.4,
                                   builder: (context, scrollController) {
                                     return CommentBottomSheet(scrollController);
                                   },
@@ -366,7 +366,55 @@ class CommentBottomSheet extends StatelessWidget {
                   }
                   return SliverList(
                     delegate: SliverChildBuilderDelegate((context, index) {
-                      return Text(Commentlist[index].text);
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 10, vertical: 10),
+                        child: Container(
+                          decoration: BoxDecoration(
+                              color: CustomColors.lightgray,
+                              borderRadius: BorderRadius.circular(10)),
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 10),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              children: [
+                                const SizedBox(
+                                  height: 10,
+                                ),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  children: [
+                                    Text(Commentlist[index].name),
+                                    const SizedBox(
+                                      width: 5,
+                                    ),
+                                    SizedBox(
+                                      height: 50,
+                                      child: Cachedimage(
+                                        imageUrl:
+                                            Commentlist[index].userthumbnailUrl,
+                                        fit: BoxFit.cover,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(
+                                  height: 10,
+                                ),
+                                Directionality(
+                                  textDirection: TextDirection.rtl,
+                                  child: Text(
+                                    Commentlist[index].text,
+                                  ),
+                                ),
+                                const SizedBox(
+                                  height: 10,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      );
                     }, childCount: Commentlist.length),
                   );
                 },
