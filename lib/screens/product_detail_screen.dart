@@ -24,11 +24,10 @@ import 'package:shop_app/widgets/loadingAnimation.dart';
 import '../data/model/product_peroperty.dart';
 import '../data/model/variant.dart';
 
-// ignore: must_be_immutable
 class ProductDetailScreen extends StatefulWidget {
-  Product product;
+  final Product product;
 
-  ProductDetailScreen(this.product, {super.key});
+  const ProductDetailScreen(this.product, {super.key});
 
   @override
   State<ProductDetailScreen> createState() => _ProductDetailScreenState();
@@ -66,7 +65,7 @@ class DetailScreenContent extends StatelessWidget {
       body: BlocBuilder<ProductBloc, ProductState>(
         builder: ((context, state) {
           if (state is ProductDetailLoadingState) {
-            return Center(child: LoadingAnimation());
+            return const Center(child: LoadingAnimation());
           }
           return SafeArea(
             child: CustomScrollView(
@@ -171,6 +170,12 @@ class DetailScreenContent extends StatelessWidget {
                     child: GestureDetector(
                       onTap: () {
                         showModalBottomSheet(
+                            shape: const RoundedRectangleBorder(
+                                borderRadius: BorderRadius.only(
+                                    topLeft: Radius.circular(15),
+                                    topRight: Radius.circular(15))),
+                            backgroundColor:
+                                const Color.fromARGB(87, 206, 206, 206),
                             context: context,
                             builder: ((context) {
                               return BlocProvider(
@@ -181,9 +186,9 @@ class DetailScreenContent extends StatelessWidget {
                                   return bloc;
                                 },
                                 child: DraggableScrollableSheet(
-                                  initialChildSize: 0.7,
-                                  maxChildSize: 0.8,
-                                  minChildSize: 0.4,
+                                  // initialChildSize: 0.7,
+                                  // maxChildSize: 0.9,
+                                  // minChildSize: 0.4,
                                   builder: (context, scrollController) {
                                     return CommentBottomSheet(scrollController);
                                   },
@@ -334,17 +339,17 @@ class DetailScreenContent extends StatelessWidget {
 }
 
 class CommentBottomSheet extends StatelessWidget {
-  CommentBottomSheet(
+  const CommentBottomSheet(
     this.scrollController, {
     super.key,
   });
-  ScrollController scrollController;
+  final ScrollController scrollController;
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<CommentBloc, CommentState>(
       builder: ((context, state) {
         if (state is CommentLoading) {
-          return Center(
+          return const Center(
             child: LoadingAnimation(),
           );
         }
@@ -354,14 +359,17 @@ class CommentBottomSheet extends StatelessWidget {
             if (state is CommentResponse) ...{
               state.response.fold(
                 (l) {
-                  return SliverToBoxAdapter(
-                    child: Text('loading'),
+                  return const SliverToBoxAdapter(
+                    child: Text(
+                      'خطایی در نمایش نظرات رخ داده است',
+                      textAlign: TextAlign.end,
+                    ),
                   );
                 },
-                (Commentlist) {
-                  if (Commentlist.isEmpty) {
-                    return SliverToBoxAdapter(
-                      child: Text('no comment'),
+                (commentlist) {
+                  if (commentlist.isEmpty) {
+                    return const SliverToBoxAdapter(
+                      child: Text('نظری برای این محصول ثبت نشده است'),
                     );
                   }
                   return SliverList(
@@ -384,18 +392,24 @@ class CommentBottomSheet extends StatelessWidget {
                                 Row(
                                   mainAxisAlignment: MainAxisAlignment.end,
                                   children: [
-                                    Text(Commentlist[index].name),
+                                    commentlist[index].name.isNotEmpty
+                                        ? Text(commentlist[index].name)
+                                        : Text(commentlist[index].username),
                                     const SizedBox(
                                       width: 5,
                                     ),
                                     SizedBox(
-                                      height: 50,
-                                      child: Cachedimage(
-                                        imageUrl:
-                                            Commentlist[index].userthumbnailUrl,
-                                        fit: BoxFit.cover,
-                                      ),
-                                    ),
+                                        height: 40,
+                                        child: (commentlist[index]
+                                                .avatar
+                                                .isNotEmpty)
+                                            ? Cachedimage(
+                                                imageUrl: commentlist[index]
+                                                    .userthumbnailUrl,
+                                                fit: BoxFit.cover,
+                                              )
+                                            : Image.asset(
+                                                'assets/images/avatar.png')),
                                   ],
                                 ),
                                 const SizedBox(
@@ -404,7 +418,7 @@ class CommentBottomSheet extends StatelessWidget {
                                 Directionality(
                                   textDirection: TextDirection.rtl,
                                   child: Text(
-                                    Commentlist[index].text,
+                                    commentlist[index].text,
                                   ),
                                 ),
                                 const SizedBox(
@@ -415,7 +429,7 @@ class CommentBottomSheet extends StatelessWidget {
                           ),
                         ),
                       );
-                    }, childCount: Commentlist.length),
+                    }, childCount: commentlist.length),
                   );
                 },
               )
@@ -428,8 +442,8 @@ class CommentBottomSheet extends StatelessWidget {
 }
 
 class AddToBasketButton extends StatelessWidget {
-  Product product;
-  AddToBasketButton(this.product, {super.key});
+  final Product product;
+  const AddToBasketButton(this.product, {super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -455,10 +469,10 @@ class AddToBasketButton extends StatelessWidget {
                   context.read<ProductBloc>().add(ProductAddToBasket(product));
                   context.read<BasketBloc>().add(BasketFetchfromHiveEvent());
                 },
-                child: Container(
+                child: const SizedBox(
                   height: 53,
                   width: 160,
-                  child: const Center(
+                  child: Center(
                     child: Text(
                       'افزودن سبد خرید',
                       style: TextStyle(
@@ -476,8 +490,8 @@ class AddToBasketButton extends StatelessWidget {
 }
 
 class PriceTagButton extends StatelessWidget {
-  Product product;
-  PriceTagButton(this.product, {super.key});
+  final Product product;
+  const PriceTagButton(this.product, {super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -498,7 +512,7 @@ class PriceTagButton extends StatelessWidget {
             borderRadius: const BorderRadius.all(Radius.circular(15)),
             child: BackdropFilter(
               filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-              child: Container(
+              child: SizedBox(
                 height: 53,
                 width: 160,
                 child: Padding(
@@ -548,11 +562,11 @@ class PriceTagButton extends StatelessWidget {
                           ),
                         ),
                         child: Padding(
-                          padding:
-                              EdgeInsets.symmetric(vertical: 2, horizontal: 6),
+                          padding: const EdgeInsets.symmetric(
+                              vertical: 2, horizontal: 6),
                           child: Row(
                             children: [
-                              Text(
+                              const Text(
                                 '%',
                                 style: TextStyle(
                                     fontFamily: 'SB',
@@ -584,8 +598,8 @@ class PriceTagButton extends StatelessWidget {
 }
 
 class ProductProperties extends StatefulWidget {
-  List<ProductProperty> productperoperty;
-  ProductProperties(
+  final List<ProductProperty> productperoperty;
+  const ProductProperties(
     this.productperoperty, {
     super.key,
   });
@@ -697,8 +711,8 @@ class _ProductPropertiesState extends State<ProductProperties> {
 }
 
 class ProductDescription extends StatefulWidget {
-  String productDescription;
-  ProductDescription(
+  final String productDescription;
+  const ProductDescription(
     this.productDescription, {
     super.key,
   });
@@ -767,20 +781,20 @@ class _ProductDescriptionState extends State<ProductDescription> {
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 44, vertical: 10),
             child: Container(
-              padding: EdgeInsets.all(8),
+              padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(15),
                 border: Border.all(width: 1, color: CustomColors.gray),
               ),
               child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: 10),
+                padding: const EdgeInsets.symmetric(horizontal: 10),
                 child: Directionality(
                   textDirection: TextDirection.rtl,
                   child: Text(
                     widget.productDescription,
                     textAlign: TextAlign.justify,
-                    style: TextStyle(
+                    style: const TextStyle(
                       height: 2,
                       fontFamily: 'SB',
                       fontSize: 14,
@@ -822,8 +836,8 @@ class VariantContainerGenerator extends StatelessWidget {
 }
 
 class VariantGeneratorChild extends StatelessWidget {
-  ProductVariant productVariant;
-  VariantGeneratorChild(this.productVariant, {super.key});
+  final ProductVariant productVariant;
+  const VariantGeneratorChild(this.productVariant, {super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -978,8 +992,8 @@ class _GallerywidgetState extends State<Gallerywidget> {
 }
 
 class ColorVariantList extends StatefulWidget {
-  List<Variant> variantList;
-  ColorVariantList(this.variantList, {super.key});
+  final List<Variant> variantList;
+  const ColorVariantList(this.variantList, {super.key});
 
   @override
   State<ColorVariantList> createState() => _ColorVariantListState();
@@ -1006,7 +1020,7 @@ class _ColorVariantListState extends State<ColorVariantList> {
                 });
               },
               child: Container(
-                margin: EdgeInsets.only(left: 15),
+                margin: const EdgeInsets.only(left: 15),
                 height: 28,
                 width: 28,
                 decoration: BoxDecoration(
@@ -1020,7 +1034,7 @@ class _ColorVariantListState extends State<ColorVariantList> {
                   borderRadius: BorderRadius.circular(5),
                 ),
                 child: Container(
-                  padding: EdgeInsets.all(2),
+                  padding: const EdgeInsets.all(2),
                   height: 26,
                   width: 26,
                   decoration: BoxDecoration(
@@ -1044,8 +1058,8 @@ class _ColorVariantListState extends State<ColorVariantList> {
 }
 
 class StorageVariantList extends StatefulWidget {
-  List<Variant> storagevariantList;
-  StorageVariantList(this.storagevariantList, {super.key});
+  final List<Variant> storagevariantList;
+  const StorageVariantList(this.storagevariantList, {super.key});
 
   @override
   State<StorageVariantList> createState() => _StorageVariantListState();
