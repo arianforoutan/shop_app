@@ -186,11 +186,14 @@ class DetailScreenContent extends StatelessWidget {
                                   return bloc;
                                 },
                                 child: DraggableScrollableSheet(
-                                  // initialChildSize: 0.7,
+                                  initialChildSize: 1,
                                   // maxChildSize: 0.9,
-                                  // minChildSize: 0.4,
+                                  minChildSize: 0.4,
                                   builder: (context, scrollController) {
-                                    return CommentBottomSheet(scrollController);
+                                    return CommentBottomSheet(
+                                      scrollController,
+                                      productId: parentWidget.product.id,
+                                    );
                                   },
                                 ),
                               );
@@ -339,11 +342,14 @@ class DetailScreenContent extends StatelessWidget {
 }
 
 class CommentBottomSheet extends StatelessWidget {
-  const CommentBottomSheet(
+  CommentBottomSheet(
     this.scrollController, {
+    required this.productId,
     super.key,
   });
   final ScrollController scrollController;
+  final String productId;
+  final TextEditingController textController = TextEditingController();
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<CommentBloc, CommentState>(
@@ -353,87 +359,156 @@ class CommentBottomSheet extends StatelessWidget {
             child: LoadingAnimation(),
           );
         }
-        return CustomScrollView(
-          controller: scrollController,
-          slivers: [
-            if (state is CommentResponse) ...{
-              state.response.fold(
-                (l) {
-                  return const SliverToBoxAdapter(
-                    child: Text(
-                      'خطایی در نمایش نظرات رخ داده است',
-                      textAlign: TextAlign.end,
-                    ),
-                  );
-                },
-                (commentlist) {
-                  if (commentlist.isEmpty) {
-                    return const SliverToBoxAdapter(
-                      child: Text('نظری برای این محصول ثبت نشده است'),
-                    );
-                  }
-                  return SliverList(
-                    delegate: SliverChildBuilderDelegate((context, index) {
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 10, vertical: 10),
-                        child: Container(
-                          decoration: BoxDecoration(
-                              color: CustomColors.lightgray,
-                              borderRadius: BorderRadius.circular(10)),
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 10),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.end,
-                              children: [
-                                const SizedBox(
-                                  height: 10,
-                                ),
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.end,
-                                  children: [
-                                    commentlist[index].name.isNotEmpty
-                                        ? Text(commentlist[index].name)
-                                        : Text(commentlist[index].username),
-                                    const SizedBox(
-                                      width: 5,
-                                    ),
-                                    SizedBox(
-                                        height: 40,
-                                        child: (commentlist[index]
-                                                .avatar
-                                                .isNotEmpty)
-                                            ? Cachedimage(
-                                                imageUrl: commentlist[index]
-                                                    .userthumbnailUrl,
-                                                fit: BoxFit.cover,
-                                              )
-                                            : Image.asset(
-                                                'assets/images/avatar.png')),
-                                  ],
-                                ),
-                                const SizedBox(
-                                  height: 10,
-                                ),
-                                Directionality(
-                                  textDirection: TextDirection.rtl,
-                                  child: Text(
-                                    commentlist[index].text,
-                                  ),
-                                ),
-                                const SizedBox(
-                                  height: 10,
-                                ),
-                              ],
+        return Column(
+          children: [
+            Container(
+              margin: const EdgeInsets.all(5),
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10), color: Colors.white),
+              width: double.infinity,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: SizedBox(
+                      height: 50,
+                      width: MediaQuery.sizeOf(context).width / 1.5,
+                      child: Directionality(
+                        textDirection: TextDirection.rtl,
+                        child: TextField(
+                          controller: textController,
+                          decoration: InputDecoration(
+                            labelText: ' نظر خود را بنویسید',
+                            labelStyle: const TextStyle(
+                                fontFamily: 'SM',
+                                fontSize: 18,
+                                color: Color.fromARGB(146, 0, 0, 0)),
+                            enabledBorder: OutlineInputBorder(
+                              borderSide: const BorderSide(
+                                  color: CustomColors.blueIndicator, width: 2),
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderSide: const BorderSide(
+                                  color: CustomColors.blueIndicator, width: 2),
+                              borderRadius: BorderRadius.circular(20),
                             ),
                           ),
                         ),
-                      );
-                    }, childCount: commentlist.length),
-                  );
-                },
-              )
-            }
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(right: 30),
+                    child: GestureDetector(
+                      onTap: () {
+                        if (textController.text.isEmpty) {
+                          return;
+                        }
+                        context.read<CommentBloc>().add(
+                            CommentpostEvent(productId, textController.text));
+                      },
+                      child: const Icon(
+                        Icons.send_rounded,
+                        size: 40,
+                        color: CustomColors.blueIndicator,
+                      ),
+                    ),
+                  )
+                ],
+              ),
+            ),
+            Expanded(
+              child: CustomScrollView(
+                controller: scrollController,
+                slivers: [
+                  if (state is CommentResponse) ...{
+                    state.response.fold(
+                      (l) {
+                        return const SliverToBoxAdapter(
+                          child: Text(
+                            'خطایی در نمایش نظرات رخ داده است',
+                            textAlign: TextAlign.end,
+                          ),
+                        );
+                      },
+                      (commentlist) {
+                        if (commentlist.isEmpty) {
+                          return const SliverToBoxAdapter(
+                            child: Text('نظری برای این محصول ثبت نشده است'),
+                          );
+                        }
+                        return SliverList(
+                          delegate:
+                              SliverChildBuilderDelegate((context, index) {
+                            return Padding(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 10, vertical: 10),
+                              child: Container(
+                                decoration: BoxDecoration(
+                                    color: CustomColors.lightgray,
+                                    borderRadius: BorderRadius.circular(10)),
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 10),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.end,
+                                    children: [
+                                      const SizedBox(
+                                        height: 10,
+                                      ),
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.end,
+                                        children: [
+                                          commentlist[index].name.isNotEmpty
+                                              ? Text(commentlist[index].name)
+                                              : Text(
+                                                  commentlist[index].username),
+                                          const SizedBox(
+                                            width: 5,
+                                          ),
+                                          SizedBox(
+                                              height: 40,
+                                              child: (commentlist[index]
+                                                      .avatar
+                                                      .isNotEmpty)
+                                                  ? Cachedimage(
+                                                      imageUrl:
+                                                          commentlist[index]
+                                                              .userthumbnailUrl,
+                                                      fit: BoxFit.cover,
+                                                    )
+                                                  : Image.asset(
+                                                      'assets/images/avatar.png')),
+                                        ],
+                                      ),
+                                      const SizedBox(
+                                        height: 10,
+                                      ),
+                                      Directionality(
+                                        textDirection: TextDirection.rtl,
+                                        child: Text(
+                                          commentlist[index].text,
+                                        ),
+                                      ),
+                                      const SizedBox(
+                                        height: 10,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            );
+                          }, childCount: commentlist.length),
+                        );
+                      },
+                    )
+                  }
+                ],
+              ),
+            ),
           ],
         );
       }),
