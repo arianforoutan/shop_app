@@ -13,5 +13,13 @@ class BasketBloc extends Bloc<BasketEvent, BasketState> {
           await _basketItemRepository.getBasketFinalPrice();
       emit(BasketDataFetchState(basketitemlist, basketItemfinalprice));
     });
+
+    on<BasketRemoveProductEvent>((event, emit) async {
+      _basketItemRepository.removeProduct(event.index);
+      var basketitemlist = await _basketItemRepository.getAllBasketItem();
+      var basketItemfinalprice =
+          await _basketItemRepository.getBasketFinalPrice();
+      emit(BasketDataFetchState(basketitemlist, basketItemfinalprice));
+    });
   }
 }
