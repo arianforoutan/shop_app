@@ -7,6 +7,7 @@ import 'package:shop_app/bloc/basketitem/basket_event.dart';
 import 'package:shop_app/bloc/basketitem/basket_state.dart';
 import 'package:shop_app/constants/colors.dart';
 import 'package:shop_app/util/extentions/String_extentions.dart';
+import 'package:shop_app/util/extentions/double_extention.dart';
 import 'package:shop_app/widgets/cached_image.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:zarinpal/zarinpal.dart';
@@ -102,7 +103,7 @@ class _CardsScreenState extends State<CardsScreen> {
                           return SliverList(
                               delegate:
                                   SliverChildBuilderDelegate(((context, index) {
-                            return CardItem(basketitemlist[index]);
+                            return CardItem(basketitemlist[index], index);
                           }), childCount: basketitemlist.length));
                         },
                       )
@@ -136,7 +137,7 @@ class _CardsScreenState extends State<CardsScreen> {
                           child: Text(
                             (state.basketfinailPrice == 0)
                                 ? 'سبد خرید خالی است'
-                                : state.basketfinailPrice.toString(),
+                                : state.basketfinailPrice.FormatPrice(),
                             style: const TextStyle(
                               fontFamily: 'SB',
                               fontSize: 16,
@@ -157,9 +158,11 @@ class _CardsScreenState extends State<CardsScreen> {
 }
 
 class CardItem extends StatelessWidget {
-  BasketItem basketItem;
-  CardItem(
-    this.basketItem, {
+  final BasketItem basketItem;
+  final int index;
+  const CardItem(
+    this.basketItem,
+    this.index, {
     Key? key,
   }) : super(key: key);
 
@@ -250,7 +253,7 @@ class CardItem extends StatelessWidget {
                               width: 5,
                             ),
                             Text(
-                              basketItem.price.toString(),
+                              basketItem.price.FormatPrice(),
                               style: TextStyle(
                                 fontFamily: 'SB',
                                 fontSize: 14,
@@ -272,7 +275,11 @@ class CardItem extends StatelessWidget {
                             OptionCheap('تومان', color: '4287f5'),
                             OptionCheap('تومان', color: '4287f5'),
                             GestureDetector(
-                              onTap: () {},
+                              onTap: () {
+                                context
+                                    .read<BasketBloc>()
+                                    .add(BasketRemoveProductEvent(index));
+                              },
                               child: Container(
                                 decoration: BoxDecoration(
                                   border: Border.all(
@@ -351,7 +358,7 @@ class CardItem extends StatelessWidget {
                   width: 5,
                 ),
                 Text(
-                  basketItem.realprice.toString(),
+                  basketItem.realprice.FormatPrice(),
                   style: TextStyle(
                     fontFamily: 'SM',
                     fontSize: 16,
