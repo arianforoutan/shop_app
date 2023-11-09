@@ -4,6 +4,7 @@ import 'package:shop_app/data/model/basket_item.dart';
 abstract class IBasketItemDataSource {
   Future<void> addProduct(BasketItem basketItem);
   Future<List<BasketItem>> getAllBasketItem();
+  Future<void> removeProduct(int index);
 
   Future<int> getBasketFinalPrice();
 }
@@ -26,5 +27,10 @@ class BasketItemLocalDataSource extends IBasketItemDataSource {
     var finalPraice = productlist.fold(
         0, (accumulator, product) => accumulator + product.realprice!);
     return finalPraice;
+  }
+
+  @override
+  Future<void> removeProduct(int index) async {
+    await box.deleteAt(index);
   }
 }
